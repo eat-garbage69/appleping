@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>eppelbetal</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title> Pay Demo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+      background: #f2f2f7;
+      color: #000;
+    }
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      min-height: 100vh;
+      position: relative;
+    }
+    .active { display: flex !important; }
+    .top-bar {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 16px;
+      color: #007aff;
+      cursor: pointer;
+    }
+    .card {
+      width: 90%;
+      max-width: 360px;
+      height: 200px;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #222, #333);
+      color: white;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      margin: 60px 0 20px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+      cursor: default;
+    }
+    .card .top, .card .bottom {
+      display: flex;
+      justify-content: space-between;
+    }
+    .balance {
+      font-size: 14px;
+      margin-top: 6px;
+      text-align: right;
+      cursor: pointer;
+    }
+    .btn {
+      background: #007aff;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      margin: 8px 0;
+      width: 90%;
+      max-width: 360px;
+    }
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      width: 90%;
+      max-width: 360px;
+    }
+    .numpad button {
+      padding: 16px;
+      font-size: 18px;
+      border-radius: 12px;
+      border: none;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .money {
+      font-size: 36px;
+      margin: 12px;
+    }
+    .nav {
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      font-size: 16px;
+      color: #007aff;
+    }
+    input {
+      padding: 12px;
+      width: 90%;
+      max-width: 360px;
+      margin: 8px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .small {
+      color: gray;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .center {
+      text-align: center;
+    }
+    .reader-button {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #007aff;
+      border-radius: 50%;
+      margin-top: 30px;
+      position: relative;
+      animation: pulse 1.5s infinite;
+      cursor: pointer;
+    }
+    .reader-icon {
+      position: absolute;
+      width: 14px;
+      height: 22px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 1px solid #007aff;
+      border-radius: 4px;
+    }
+    .label {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #888;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.7; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .checkmark {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #007aff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #007aff;
+      margin-top: 30px;
+      animation: checkBounce 0.5s ease-out forwards;
+    }
+    @keyframes checkBounce {
+      0% { transform: scale(0); opacity: 0; }
+      60% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="top-bar" onclick="show('add-card-start')">Add Card</div>
+  <div class="card">
+    <div class="top"><span>MyCard</span><span>VISA</span></div>
+    <div class="bottom">
+      <span>•••• 7493</span>
+      <span class="balance" onclick="show('add-money')">$<span id="balance">100.00</span></span>
+    </div>
+  </div>
+  <div class="reader-button" onclick="payNow()"><div class="reader-icon"></div></div>
+  <div class="label">Hold Near Reader</div>
+</div>
+
+<!-- ADD MONEY -->
+<div id="add-money" class="screen">
+  <div class="nav">
+    <div onclick="show('home')">Cancel</div>
+    <div onclick="addMoney()">Add</div>
+  </div>
+  <div class="card">
+    <div class="top"><span>MyCard</span><span>VISA</span></div>
+    <div class="bottom">
+      <span>•••• 5924</span>
+      <span>$<span id="live-balance">100.00</span></span>
+    </div>
+  </div>
+  <div class="money" id="display-amount">$0</div>
+  <div class="small">Current Balance: $<span id="current-balance">100</span></div>
+  <div class="numpad">
+    <button onclick="typeAmount('1')">1</button>
+    <button onclick="typeAmount('2')">2</button>
+    <button onclick="typeAmount('3')">3</button>
+    <button onclick="typeAmount('4')">4</button>
+    <button onclick="typeAmount('5')">5</button>
+    <button onclick="typeAmount('6')">6</button>
+    <button onclick="typeAmount('7')">7</button>
+    <button onclick="typeAmount('8')">8</button>
+    <button onclick="typeAmount('9')">9</button>
+    <button onclick="typeAmount('.')">.</button>
+    <button onclick="typeAmount('0')">0</button>
+    <button onclick="backspace()">⌫</button>
+  </div>
+</div>
+
+<!-- PAYMENT -->
+<div id="pay-screen" class="screen">
+  <div class="card">
+    <div class="top"><span>MyCard</span><span>VISA</span></div>
+    <div class="bottom"><span>•••• 1234</span><span>$<span id="paid-balance">90.00</span></span></div>
+  </div>
+  <div class="checkmark">✓</div>
+  <div style="margin-top: 12px; color: #999;">Done</div>
+</div>
+
+<!-- CARD ADDED -->
+<div id="card-added" class="screen">
+  <div class="card">
+    <div class="top"><span>MyCard</span><span>VISA</span></div>
+    <div class="bottom"><span>•••• 1234</span><span>$<span id="card-added-balance">100.00</span></span></div>
+  </div>
+  <div class="checkmark">✓</div>
+  <div style="margin-top: 12px; color: #333; font-size: 18px;">Your card has been added to Apple Pay</div>
+  <button class="btn" onclick="show('home')">Done</button>
+</div>
+
+<!-- ADD CARD FLOW -->
+<div id="add-card-start" class="screen">
+  <div class="nav">
+    <div onclick="show('home')">Back</div>
+    <div onclick="show('add-card-step1')">Continue</div>
+  </div>
+  <div class="card">
+    <div class="top"><span>Visa</span><span>•••• 9112</span></div>
+    <div class="bottom"><span>Face ID</span></div>
+  </div>
+  <h2> Pay</h2>
+  <p class="center">Add cards to Apple Pay to send money to friends and make secure payments in apps, on the web, and in stores using NFC.</p>
+  <div class="small">Card-related info and device settings may be sent to Apple to set up Apple Pay.</div>
+</div>
+
+<div id="add-card-step1" class="screen">
+  <div class="nav">
+    <div onclick="show('add-card-start')">Back</div>
+    <div onclick="show('add-card-step2')">Next</div>
+  </div>
+  <h2>Card Details</h2>
+  <input type="text" placeholder="Name"/>
+  <input type="text" placeholder="Card Number"/>
+</div>
+
+<div id="add-card-step2" class="screen">
+  <div class="nav">
+    <div onclick="show('add-card-step1')">Back</div>
+    <div onclick="cardAdded()">Next</div>
+  </div>
+  <h2>Card Details</h2>
+  <input type="text" placeholder="Expiration Date (MM/YY)"/>
+  <input type="text" placeholder="Security Code (CVV)"/>
+</div>
+
+<!-- SOUND FILES -->
+<audio id="sound-add" src="https://www.myinstants.com/media/sounds/correct-answer-sound-effect-19.mp3"></audio>
+<audio id="sound-pay" src="https://www.myinstants.com/media/sounds/applepay.mp3"></audio>
+
+<script>
+  let balance = 100;
+  let inputAmount = "0";
+
+  function show(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    const live = document.getElementById("live-balance");
+    const current = document.getElementById("current-balance");
+    const added = document.getElementById("card-added-balance");
+    if (live) live.textContent = balance.toFixed(2);
+    if (current) current.textContent = balance.toFixed(2);
+    if (added) added.textContent = balance.toFixed(2);
+  }
+
+  function typeAmount(n) {
+    if (inputAmount === "0" && n !== ".") inputAmount = "";
+    inputAmount += n;
+    document.getElementById("display-amount").textContent = "$" + inputAmount;
+  }
+
+  function backspace() {
+    inputAmount = inputAmount.slice(0, -1) || "0";
+    document.getElementById("display-amount").textContent = "$" + inputAmount;
+  }
+
+  function addMoney() {
+    let amt = parseFloat(inputAmount);
+    if (!isNaN(amt) && amt > 0) {
+      balance += amt;
+      document.getElementById("balance").textContent = balance.toFixed(2);
+    }
+    inputAmount = "0";
+    show("home");
+  }
+
+  function payNow() {
+    if (balance >= 10) {
+      balance -= 10;
+      document.getElementById("balance").textContent = balance.toFixed(2);
+      document.getElementById("paid-balance").textContent = balance.toFixed(2);
+      document.getElementById("sound-pay").play();
+      show("pay-screen");
+      setTimeout(() => show("home"), 2000);
+    }
+  }
+
+  function cardAdded() {
+    document.getElementById("sound-add").play();
+    show("card-added");
+  }
+</script>
+</body>
+</html>
+<!-- partial -->
+  
+</body>
+</html>
